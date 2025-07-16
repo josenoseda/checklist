@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Checklist Búho MAP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+    h2 {
+      color: #C53030;
+      text-align: center;
+    }
+    h3 {
+      margin-top: 40px;
+      color: #C53030;
+      border-bottom: 2px solid #C53030;
+      padding-bottom: 8px;
+    }
+    .question-block {
+      margin-bottom: 15px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .question-block button {
+      margin-right: 10px;
+      padding: 6px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .question-block button:first-child {
+      background-color: #C53030;
+      color: white;
+    }
+    .question-block button:last-child {
+      background-color: #6c757d;
+      color: white;
+    }
+    .question-block button.selected {
+      opacity: 1;
+      box-shadow: 0 0 10px rgba(197, 48, 48, 0.4);
+      transform: scale(1.05);
+    }
+    .question-block button:not(.selected) {
+      opacity: 0.6;
+    }
+    #score {
+      display: none;
+      margin-top: 30px;
+      padding: 20px;
+      background: #fff5f5;
+      border-left: 5px solid #C53030;
+      border-radius: 6px;
+    }
+    #cta-button {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #C53030;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div style="text-align: center; margin-bottom: 30px;">
+    <img src="logo.png" alt="Búho Logo" style="max-width: 300px; height: auto; margin-bottom: 20px;">
+  </div>
+  <h2>✅ Checklist: ¿Está tu desarrollo listo para venderse como un proyecto del siglo XXI?</h2>
+  <p>Respondé estas preguntas clave y descubrí en qué nivel estás. Al final obtenés un puntaje automático y un llamado a la acción personalizado.</p>
+
+  <div id="checklist-container"></div>
+  <button onclick="calculateScore()" style="margin-top: 20px; padding: 10px 20px; background: #C53030; color: white; border: none; border-radius: 5px; cursor: pointer;">Calcular Puntaje</button>
+  <div id="score"></div>
+
+  <script>
+    const secciones = {
+      "Información del proyecto": [
+        "¿Contás con un plano digitalizado y georreferenciado de tu desarrollo?",
+        "¿Tenés los datos técnicos centralizados en un solo lugar?",
+        "¿Podés acceder fácilmente al estado actualizado de cada unidad/lote?"
+      ],
+      "Comercialización y ventas": [
+        "¿Tenés una herramienta que muestre el loteo online en tiempo real?",
+        "¿Podés enviar al cliente una hoja informativa digital personalizada?",
+        "¿Tenés un tour virtual para mostrar el proyecto a distancia?",
+        "¿Tu equipo comercial trabaja con la misma información centralizada?"
+      ],
+      "Gestión y toma de decisiones": [
+        "¿Toda la info del proyecto está en una sola plataforma accesible?",
+        "¿Evitás reuniones largas porque todos ven la disponibilidad en tiempo real?",
+        "¿Podés consultar ventas, reservas y disponibles sin abrir planillas?",
+        "¿Podés mostrar el avance del proyecto en reuniones internas o con inversores?"
+      ],
+      "Marketing y comunicación": [
+        "¿Podés ver cuántos clics recibe cada unidad o sector?",
+        "¿Tenés datos para orientar campañas según el interés real?",
+        "¿Tenés un link único y profesional para compartir el proyecto?"
+      ],
+      "Atención al cliente y experiencia": [
+        "¿El cliente puede explorar sin moverse de su casa?"
+      ],
+      "Logística y operaciones": [
+        "¿El asesor puede ubicar fácilmente zonas verdes o amenities?",
+        "¿Reducís traslados innecesarios gracias a herramientas digitales?"
+      ],
+      "Estrategia y planificación": [
+        "¿Usás reportes de comportamiento para ajustar estrategia comercial?",
+        "¿Podés evaluar el rendimiento del proyecto fácilmente?",
+        "¿Mostrás el masterplan o disponibilidad en reuniones con inversores?"
+      ]
+    };
+
+    let respuestas = [];
+    const container = document.getElementById("checklist-container");
+
+    Object.entries(secciones).forEach(([titulo, preguntas]) => {
+      const sectionHeader = document.createElement("h3");
+      sectionHeader.textContent = titulo;
+      container.appendChild(sectionHeader);
+
+      preguntas.forEach((texto, i) => {
+        const index = respuestas.length;
+        respuestas.push(0);
+        const block = document.createElement("div");
+        block.className = "question-block";
+        block.innerHTML = `
+          <div style="margin-bottom: 5px;">${texto}</div>
+          <button id="si-${index}" onclick="setRespuesta(${index}, 1)">✅ Sí</button>
+          <button id="no-${index}" onclick="setRespuesta(${index}, 0)">❌ No</button>
+        `;
+        container.appendChild(block);
+      });
+    });
+
+    function setRespuesta(index, value) {
+      respuestas[index] = value;
+
+      const siButton = document.getElementById(`si-${index}`);
+      const noButton = document.getElementById(`no-${index}`);
+
+      siButton.classList.remove('selected');
+      noButton.classList.remove('selected');
+
+      if (value === 1) {
+        siButton.classList.add('selected');
+      } else {
+        noButton.classList.add('selected');
+      }
+    }
+
+    function calculateScore() {
+      const total = respuestas.reduce((a, b) => a + b, 0);
+      let mensaje = "";
+      if (total <= 8) {
+        mensaje = "🚨 Tu proyecto necesita urgente una actualización digital. Estás perdiendo tiempo y oportunidades de venta.";
+      } else if (total <= 15) {
+        mensaje = "🛠 Vas por buen camino, pero todavía hay herramientas clave que podrían ayudarte a acelerar ventas y mejorar la experiencia de tus clientes.";
+      } else {
+        mensaje = "🚀 ¡Excelente! Estás muy cerca de convertirte en un referente en ventas inmobiliarias digitales.";
+      }
+
+      const scoreHTML = `
+        <b>Puntaje total: ${total} / 20</b><br>${mensaje}
+        <br><a id="cta-button" href="https://buhomap.com.ar/contacto" target="_blank">Contactanos y llevá tu proyecto al siguiente nivel</a>
+      `;
+      const scoreElement = document.getElementById("score");
+      scoreElement.style.display = "block";
+      scoreElement.innerHTML = scoreHTML;
+    }
+  </script>
+</body>
+</html>
